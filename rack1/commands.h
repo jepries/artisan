@@ -12,6 +12,5 @@
 #define SET_MINUTE 'M'
 #define SET_DATE   'D'
 #define SET_TIME   'T'
-#define SET_IDLE_TIME 'I'
 #define SET_FLOOD_TIME 'F'
 #endif

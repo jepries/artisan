@@ -266,10 +266,13 @@ void setup() {
 
   Serial.println("ARTISAN GROWERS   !!!");
 
-  //set up Idle Timer, using default above
-  idleTimer.setTimeOutTime(idleTime);
-  idleTimer.reset(); //start the countdown, if we are here, means we reset from power or something
-
+  //set up the next flood alarm
+  if ( !setNextFloodAlarm(getNextFloodTime()) ) {
+    Serial.println("BAD FLOOD TIME");
+    Serial.println(getNextFloodTime());
+    hd44780::fatalError(-1); // does not return
+  }
+  
   floodTimer.setTimeOutTime(floodTime);
 
   updateLcdTimer.setTimeOutTime(30000); //lets update the lcd once per minute, loop counter 2 times this
@@ -680,11 +683,17 @@ int getNextFloodTime() {
   //if we get here, there are no flood times configured.
   return -1; //negative flood time is NO FLOOD TIME  
 }
-int setNextFloodAlarm(int ft) {
+bool setNextFloodAlarm(int ft) {
+  if (ft < 0) {
+    Serial.println(" ##### NO FLOOD TIME AVAILABLE ###### ");
+    rtc.disableAlarm();
+    return false;
+  }
   rtc.setAlarmTime((int)ft/3600, (int)ft%60, 0);
   triggerFlood = false;
   rtc.enableAlarm(rtc.MATCH_HHMMSS);
   rtc.attachInterrupt(alarmMatch);
+  return true;
 }
 void alarmMatch() {
   triggerFlood = true;

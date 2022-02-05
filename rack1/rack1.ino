@@ -808,7 +808,7 @@ void idle_onEnter() {
   //Open the Overflow Valves
   controlFloodStationOverflowValves(HIGH);
 
-  printState(lcd, stateName[stateMachine.GetState()], idleTimer.getRemainingTime());
+  //printState(lcd, stateName[stateMachine.GetState()], idleTimer.getRemainingTime());
   turnOnLcd();
 }
 
@@ -821,10 +821,10 @@ void idle_onState() {
   // indicate to user how much time is left
   unsigned long loopCount = updateLcdTimer.getLoopCount();
   static bool alreadyUpdated = false;
-  unsigned long remainingTime = idleTimer.getRemainingTime();
+  unsigned long remainingTime = 0;//idleTimer.getRemainingTime();
   // if it is time to update (loopcount), or we changed something (updatenow) or we are in seconds left:
   if ((((loopCount % 2) == 0) && !alreadyUpdated) || updateStateNow || (remainingTime < 60000 && secondTimer.hasTimedOut())) {  //every other 30 second loop count is 1 minute :)
-    printState(lcd, stateName[stateMachine.GetState()], idleTimer.getRemainingTime());
+    printState(lcd, stateName[stateMachine.GetState()], 0);//idleTimer.getRemainingTime());
     alreadyUpdated = true;
   }
   if (loopCount % 2 == 1 ) alreadyUpdated = false;

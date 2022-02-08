@@ -2,9 +2,8 @@
 // - disabled stations
 
 //issues, 
-//     in idle mode, make sure level drain are OPEN, HIGH 
-//     put actual on time floods (8am, 4pm) 
-//     rip out opening valves by levels, open all at once
+//     seconds countdown in idle mode
+//     pump not turning on in flood
 
 
 
@@ -30,7 +29,7 @@
 //#include <string.h> //string libraries
 
 #define DEV_PLATFORM //comment line out for PROD platform
-//#define DEBUG_STATES //uncoment when done troubleshooting states
+#define DEBUG_STATES //uncoment when done troubleshooting states
 
 /*****************************************************************
    Chanel Labels, English Words for IO Pins
@@ -267,13 +266,17 @@ void setup() {
   Serial.println("ARTISAN GROWERS   !!!");
 
   //set up the next flood alarm
-  if ( !setNextFloodAlarm(getNextFloodTime()) ) {
+  int nextFloodTime = getNextFloodTime();
+  Serial.print("next flood time: ");
+  Serial.println(nextFloodTime);
+  if ( !setNextFloodAlarm(nextFloodTime) ) {
     Serial.println("BAD FLOOD TIME");
     Serial.println(getNextFloodTime());
     hd44780::fatalError(-1); // does not return
   }
   
   floodTimer.setTimeOutTime(floodTime);
+  floodTimer.reset();
 
   updateLcdTimer.setTimeOutTime(30000); //lets update the lcd once per minute, loop counter 2 times this
   updateLcdTimer.reset(); //start the lcd update timer
@@ -284,6 +287,17 @@ void setup() {
 
 
   printMenu();
+
+  //PUMP OFF
+  controlPump(pump, LOW);
+  //OPEN the Level Drain Valves
+  controlLevelDrainValves(HIGH);
+  //Open the Vent Valve
+  controlVentValve(HIGH);
+  //Open the Drain Vavles
+  controlFloodStationDrainValves(HIGH);
+  //Open the Overflow Valves
+  controlFloodStationOverflowValves(HIGH);
 
   setupStateMachine();
 
@@ -362,10 +376,10 @@ void printState(hd44780_I2Cexp &outlcd, String stateLabel, unsigned long remaini
     outlcd.write(' ');
     int hours = remainingmillis / 3600000;
     int minutes = (remainingmillis % 3600000) / 60000;
-    if (hours < 9) outlcd.write('0');
+    if (hours <= 9) outlcd.write('0');
     outlcd.print((int)hours);
     outlcd.write(':');
-    if (minutes < 9) outlcd.write('0');
+    if (minutes <= 9) outlcd.write('0');
     outlcd.print((int)minutes);
 
     if (remainingmillis < 60000) {
@@ -606,6 +620,11 @@ int runCommand() {
       floodTimer.reset();
       updateStateNow = true;
       break;
+    case SET_FLOOD_3:
+      floodTimes[2] = (int)arg1;
+      setNextFloodAlarm((int)arg1);
+      updateStateNow = true;
+      break;
     default:
       Serial.println("Invalid Command");
   }
@@ -689,7 +708,7 @@ bool setNextFloodAlarm(int ft) {
     rtc.disableAlarm();
     return false;
   }
-  rtc.setAlarmTime((int)ft/3600, (int)ft%60, 0);
+  rtc.setAlarmTime((int)ft/100, (int)ft%100, 0);
   triggerFlood = false;
   rtc.enableAlarm(rtc.MATCH_HHMMSS);
   rtc.attachInterrupt(alarmMatch);
@@ -697,6 +716,67 @@ bool setNextFloodAlarm(int ft) {
 }
 void alarmMatch() {
   triggerFlood = true;
+}
+long millisTillNextFlood() {
+  int alarmHour = rtc.getAlarmHours();
+  int alarmMin = rtc.getAlarmMinutes();
+  int nowHour = rtc.getHours();
+  int nowMin = rtc.getMinutes();
+  int nowSec = rtc.getSeconds();
+
+  //deal with rollover :(
+  int alarmHM = alarmHour * 100 + alarmMin;
+  int nowHM = nowHour * 100 + nowMin;
+#ifdef DEBUG_STATES
+  Serial.print("AlarmHM: ");
+  Serial.print(alarmHM);
+  Serial.print(", NowHM: ");
+  Serial.println(nowHM);
+#endif
+
+  int diffMin = 0;
+  int diffHour = 0;
+  if (nowHM > alarmHM){
+    //we are say at like 5pm (1700) and the next alarm is at 8am (0800)
+    if (alarmMin == nowMin) {
+      diffMin = 0;
+      diffHour = 24 + alarmHour - nowHour;
+    } else if (alarmMin < nowMin) {
+      diffMin = 60 + alarmMin - nowMin;
+      diffHour = 24 - nowHour + alarmHour - 1;
+      if (diffHour < 0) diffHour = 0;
+    } else {
+      if (alarmMin ==0){
+        diffMin = 60 - nowMin;
+        if (diffMin == 60) diffMin = 0;
+      } else {
+        diffMin = alarmMin - nowMin;
+      }
+      diffHour = 24 - nowHour + alarmHour;
+    }
+  } else {
+    //next alarm is ahead of us in this day
+    //first, subract the minutes....
+    if (alarmMin == nowMin) {
+      diffMin = 0;
+      diffHour = alarmHour - nowHour;
+    } else if (alarmMin < nowMin){
+      //then we have to borrow 60 minutes from the hour
+      diffMin = 60 + alarmMin - nowMin;
+      diffHour = alarmHour - nowHour - 1;
+      if (diffHour < 0) diffHour = 0;
+    } else {
+      //math is easy
+      if (alarmMin == 0) {
+        diffMin = 60 - nowMin;
+        if (diffMin == 60) diffMin = 0;
+      } else {
+        diffMin = alarmMin - nowMin;
+      }
+      diffHour = alarmHour - nowHour;
+    }
+  }
+  return diffHour*3600000 + diffMin * 60000 + (60 - nowSec) * 1000;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -712,6 +792,7 @@ void loop() {
   checkRunSwitch();
   checkDisabledFloodStations();
   stateMachine.Update();
+  
 
   // update the clock every minute
   unsigned long loopCount = updateLcdTimer.getLoopCount();
@@ -824,15 +905,18 @@ void idle_onState() {
   unsigned long remainingTime = 0;//idleTimer.getRemainingTime();
   // if it is time to update (loopcount), or we changed something (updatenow) or we are in seconds left:
   if ((((loopCount % 2) == 0) && !alreadyUpdated) || updateStateNow || (remainingTime < 60000 && secondTimer.hasTimedOut())) {  //every other 30 second loop count is 1 minute :)
-    printState(lcd, stateName[stateMachine.GetState()], 0);//idleTimer.getRemainingTime());
+    printState(lcd, stateName[stateMachine.GetState()], millisTillNextFlood());//idleTimer.getRemainingTime());
     alreadyUpdated = true;
   }
   if (loopCount % 2 == 1 ) alreadyUpdated = false;
 
+#ifndef DEBUG_STATES
   if (backlightTimer.hasTimedOut() && !alreadyDimmed) {
     lcd.noBacklight();
     alreadyDimmed = true;
   }
+#endif
+
 }
 
 void idle_onExit() {
@@ -853,11 +937,15 @@ bool transition_5() {
   //TODO BASE THIS ON A TIME, NOT A TIMER
 #ifdef DEBUG_STATES
   Serial.print("transition_5: ");
-  Serial.print(idleTimer.hasTimedOut());
-  Serial.print(" : ");
-  Serial.println(idleTimer.getRemainingTime());
+  Serial.print(triggerFlood);
+  Serial.println(";");
 #endif
-  //return idleTimer.hasTimedOut();
+  if (triggerFlood) {
+    triggerFlood = false;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /**********************************************************************

@@ -1,9 +1,9 @@
 //FEATURES TO TEST
-// - disabled stations
+// 
 
 //issues, 
-//     seconds countdown in idle mode
-//     pump not turning on in flood
+//     Define a clean state
+//     
 
 
 

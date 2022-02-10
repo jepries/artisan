@@ -193,11 +193,12 @@ bool triggerFlood = false; //has the flood triggered?
 YA_FSM stateMachine;
 
 // State Alias
-enum State { Idle, Flood, IdlePauseTemp, IdlePause, IdlePumpOvr, IdlePumpOff, FldPauseTemp, FldPause, FldPumpOvr, FldPumpOff };
+enum State { Idle, Flood, IdlePauseTemp, IdlePause, IdlePumpOvr, IdlePumpOff, FldPauseTemp, FldPause, FldPumpOvr, FldPumpOff, Clean, ClnPumpOvr, ClnPumpOff };
 
 // Helper for print labels instead integer when state change
 const char* const stateName[] PROGMEM = { "Idle", "Flood", "Idle Pause Temp", "Idle Pause", "Pause Pump Override", "Pause Pump Off",
-                                          "Flood Pause Temp", "Flood Pause", "Pause Pump Override", "Pause Pump Off"
+                                          "Flood Pause Temp", "Flood Pause", "Pause Pump Override", "Pause Pump Off", 
+                                          "Clean", "Clean Pump Override", "Clean Pump Off"
                                         };
 
 
@@ -975,7 +976,7 @@ void idle_onState() {
 
 #ifndef DEBUG_STATES
   if (backlightTimer.hasTimedOut() && !alreadyDimmed) {
-    lcd.noBacklight();
+    //lcd.noBacklight();
     alreadyDimmed = true;
   }
 #endif
@@ -1255,6 +1256,82 @@ void fpoff_onEnter() {
   printState(lcd, stateName[stateMachine.GetState()], 0);
 }
 
+
+/**********************************************************************
+   CLEAN 
+ **********************************************************************/
+
+void clean_onEnter() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Entering State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, LOW);
+  controlLevelDrainValves(HIGH);
+  controlFloodStationDrainValves(LOW);
+  controlFloodStationOverflowValves(LOW);
+  controlVentValve(LOW);
+
+  printState(lcd, stateName[stateMachine.GetState()], 0);
+  backlightTimer.reset();
+}
+
+/**********************************************************************
+   CLEAN PUMP OVERRIDE
+ **********************************************************************/
+
+void cpovr_onEnter() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Entering State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, HIGH);
+  printState(lcd, stateName[stateMachine.GetState()], 0);
+  lcd.setCursor(0, 3);
+  lcd.write("PUMP OVR");
+}
+void cpovr_onExit() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Exiting State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, LOW);
+}
+
+/**********************************************************************
+   CLEAN  PUMP OFF
+ **********************************************************************/
+
+void cpoff_onEnter() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Entering State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, LOW);
+  printState(lcd, stateName[stateMachine.GetState()], 0);
+}
+
+bool allStationsDisabled() {
+  //true, the station is enabled
+  //false, the station is disabled
+  //INPUT, LOW the station is enabled.
+  for (int i=0; i<numStations; i++) {
+    if ( P1.readDiscrete(StationDisabledSwitches[i]) == LOW ) {
+      return false; //at least 1 station is enabled, LOW = enabled.
+    }
+  }
+  return true; // no stations were enabled, therefore all stations are disabled
+}
+bool notAllStationsDisabled() {
+  return !allStationsDisabled();
+}
+
+
+
 /**********************************************************************
    STATE MACHINE DEFINITION
  **********************************************************************/
@@ -1278,6 +1355,10 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[FldPumpOvr],       0, fpovr_onEnter, nullptr,       ipovr_onExit );
   stateMachine.AddState(stateName[FldPumpOff],       0, fpoff_onEnter, nullptr,       nullptr      );
 
+  stateMachine.AddState(stateName[Clean],            0, clean_onEnter, nullptr,       nullptr      );
+  stateMachine.AddState(stateName[ClnPumpOvr],       0, cpovr_onEnter, nullptr,       cpovr_onExit );
+  stateMachine.AddState(stateName[ClnPumpOff],       0, cpoff_onEnter, nullptr,       nullptr      );
+
   // Add transitions with related trigger input callback functions
   stateMachine.AddTransition(Idle,          Flood,         transition_5                            );
   stateMachine.AddTransition(Flood,         Idle,          transition_6                            );
@@ -1288,6 +1369,13 @@ void setupStateMachine() {
   stateMachine.AddTransition(IdlePause,     IdlePumpOvr,   checkPumpSwitch                         );
   stateMachine.AddTransition(IdlePumpOvr,   IdlePumpOff,   notCheckPumpSwitch                      );
   stateMachine.AddTransition(IdlePumpOff,   IdlePause, []() { return true; }                       );
+
+  stateMachine.AddTransition(IdlePause,     Clean,         allStationsDisabled                     );
+  stateMachine.AddTransition(Clean,         IdlePause,     notAllStationsDisabled                  );
+  stateMachine.AddTransition(Clean,         ClnPumpOvr,    checkPumpSwitch                         );
+  stateMachine.AddTransition(ClnPumpOvr,    ClnPumpOff,    notCheckPumpSwitch                      );
+  stateMachine.AddTransition(ClnPumpOff,    Clean,     []() { return true; }                       );
+
 
   stateMachine.AddTransition(Flood,         FldPauseTemp, notCheckRunSwitch                        );
   stateMachine.AddTransition(FldPauseTemp,  Idle,         checkRunSwitch                           );

@@ -17,5 +17,7 @@
 #define SET_FLOOD_2 '2'
 #define SET_FLOOD_3 '3'
 #define SET_FLOOD_4 '4'
-#define PRINT_FLOODS 'P'
+#define LIST_FLOODS 'L'
+#define NEXT_FLOOD  'N'
+#define PRINT_MENU  'U'
 #endif

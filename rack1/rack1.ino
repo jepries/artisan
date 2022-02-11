@@ -1,8 +1,8 @@
 //FEATURES TO TEST
-// 
+// do not go into flood if all stations are disabled  
 
 //issues, 
-//     Next flood not calculating after setting a new time
+//     Next flood not calculating after setting a new time, something about 0, or less than 800
 //     
 
 
@@ -1004,7 +1004,7 @@ bool transition_5() {
   Serial.print(triggerFlood);
   Serial.println(";");
 #endif
-  if (triggerFlood) {
+  if (triggerFlood && notAllStationsDisabled()) {
     triggerFlood = false;
     return true;
   } else {

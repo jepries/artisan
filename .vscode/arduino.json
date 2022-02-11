@@ -1,0 +1,6 @@
+{
+    "board": "P1AM-100:samd:P1AM-100_native",
+    "programmer": "P1AM-100:atmel_ice",
+    "sketch": "rack1/rack1.ino",
+    "port": "/dev/cu.usbmodem14201"
+}

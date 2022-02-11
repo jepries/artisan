@@ -1,9 +1,10 @@
 //FEATURES TO TEST
-// - disabled stations
+// do not go into flood if all stations are disabled  
 
 //issues, 
-//     in idle mode, make sure level drain are OPEN, HIGH 
-//     put actual on time floods (8am, 4pm) 
+//     Next flood not calculating after setting a new time, something about 0, or less than 800
+//     
+
 
 
 
@@ -66,35 +67,38 @@
 channelLabel pump = {3, 15};
 channelLabel pumpOverride = {1, 8};
 
+// vent valve
+channelLabel VV_1 = {2, 1};
+
 // station disalble switches, FS = Flood Station, D = Disable
-channelLabel FS1_D = {1, 1};
-channelLabel FS2_D = {1, 2};
-channelLabel FS3_D = {1, 3};
-channelLabel FS4_D = {1, 4};
-channelLabel FS5_D = {1, 5};
-channelLabel FS6_D = {1, 6};
+channelLabel FSA_D = {1, 1};
+channelLabel FSB_D = {1, 2};
+channelLabel FSC_D = {1, 3};
+channelLabel FSD_D = {1, 4};
+channelLabel FSE_D = {1, 5};
+channelLabel FSF_D = {1, 6};
 
 //valves, V=valve, S=station, O for overflow, D for drain
 //valves, V=valve, L=Level, O for overflow, D for drain, Overflow is a MANUAL valve
 channelLabel VL1_D = {3, 1};
-channelLabel VS1_O = {3, 2};
-channelLabel VS1_D = {3, 3};
-channelLabel VS2_O = {3, 4};
-channelLabel VS2_D = {3, 5};
-channelLabel VS3_O = {3, 6};
-channelLabel VS3_D = {3, 7};
+channelLabel VSA_O = {3, 2};
+channelLabel VSA_D = {3, 3};
+channelLabel VSB_O = {3, 4};
+channelLabel VSB_D = {3, 5};
+channelLabel VSC_O = {3, 6};
+channelLabel VSC_D = {3, 7};
 
 channelLabel VL2_D = {3, 8};
-channelLabel VS4_O = {3, 9};
-channelLabel VS4_D = {3, 10};
-channelLabel VS5_O = {3, 11};
-channelLabel VS5_D = {3, 12};
-channelLabel VS6_O = {3, 13};
-channelLabel VS6_D = {3, 14};
+channelLabel VSD_O = {3, 9};
+channelLabel VSD_D = {3, 10};
+channelLabel VSE_O = {3, 11};
+channelLabel VSE_D = {3, 12};
+channelLabel VSF_O = {3, 13};
+channelLabel VSF_D = {3, 14};
 
-channelLabel StationDrainValves[]      = { VS1_D, VS2_D, VS3_D, VS4_D, VS5_D, VS6_D };
-channelLabel StationOverflowValves[]   = { VS1_O, VS2_O, VS3_O, VS4_O, VS5_O, VS6_O };
-channelLabel StationDisabledSwitches[] = { FS1_D, FS2_D, FS3_D, FS4_D, FS5_D, FS6_D };
+channelLabel StationDrainValves[]      = { VSA_D, VSB_D, VSC_D, VSD_D, VSE_D, VSF_D };
+channelLabel StationOverflowValves[]   = { VSA_O, VSB_O, VSC_O, VSD_O, VSE_O, VSF_O };
+channelLabel StationDisabledSwitches[] = { FSA_D, FSB_D, FSC_D, FSD_D, FSE_D, FSF_D };
 channelLabel LevelDrainValves[]        = { VL1_D, VL2_D };
 const int numLevels = 2;
 const int numStationsPerLevel = 3;
@@ -107,58 +111,61 @@ bool previousStations[] =  { true, true, true, true, true, true };
 channelLabel pump = {3, 15};
 channelLabel pumpOverride = {2, 8};
 
-// station disalble switches, FS = Flood Station, D = Disable
-channelLabel FS1_D = {1, 1};
-channelLabel FS2_D = {1, 2};
-channelLabel FS3_D = {1, 3};
-channelLabel FS4_D = {1, 4};
-channelLabel FS5_D = {1, 5};
-channelLabel FS6_D = {1, 6};
+// vent valve
+channelLabel VV_1 = {4, 15};
 
-channelLabel FS7_D  = {2, 1};
-channelLabel FS8_D  = {2, 2};
-channelLabel FS9_D  = {2, 3};
-channelLabel FS10_D = {2, 4};
-channelLabel FS11_D = {2, 5};
-channelLabel FS12_D = {2, 6};
+// station disalble switches, FS = Flood Station, D = Disable
+channelLabel FSA_D = {1, 1};
+channelLabel FSB_D = {1, 2};
+channelLabel FSC_D = {1, 3};
+channelLabel FSD_D = {1, 4};
+channelLabel FSE_D = {1, 5};
+channelLabel FSF_D = {1, 6};
+
+channelLabel FSG_D  = {2, 1};
+channelLabel FSH_D  = {2, 2};
+channelLabel FSI_D  = {2, 3};
+channelLabel FSJ_D  = {2, 4};
+channelLabel FSK_D  = {2, 5};
+channelLabel FSL_D  = {2, 6};
 
 //valves, V=valve, S=station, O for overflow, D for drain
 //valves, V=valve, L=Level, O for overflow, D for drain, Overflow is a MANUAL valve
 channelLabel VL1_D = {3, 1};
-channelLabel VS1_O = {3, 2};
-channelLabel VS1_D = {3, 3};
-channelLabel VS2_O = {3, 4};
-channelLabel VS2_D = {3, 5};
-channelLabel VS3_O = {3, 6};
-channelLabel VS3_D = {3, 7};
+channelLabel VSA_O = {3, 2};
+channelLabel VSA_D = {3, 3};
+channelLabel VSB_O = {3, 4};
+channelLabel VSB_D = {3, 5};
+channelLabel VSC_O = {3, 6};
+channelLabel VSC_D = {3, 7};
 
 channelLabel VL2_D = {3, 8};
-channelLabel VS4_O = {3, 9};
-channelLabel VS4_D = {3, 10};
-channelLabel VS5_O = {3, 11};
-channelLabel VS5_D = {3, 12};
-channelLabel VS6_O = {3, 13};
-channelLabel VS6_D = {3, 14};
+channelLabel VSD_O = {3, 9};
+channelLabel VSD_D = {3, 10};
+channelLabel VSE_O = {3, 11};
+channelLabel VSE_D = {3, 12};
+channelLabel VSF_O = {3, 13};
+channelLabel VSF_D = {3, 14};
 
 channelLabel VL3_D = {4, 1};
-channelLabel VS7_O = {4, 2};
-channelLabel VS7_D = {4, 3};
-channelLabel VS8_O = {4, 4};
-channelLabel VS8_D = {4, 5};
-channelLabel VS9_O = {4, 6};
-channelLabel VS9_D = {4, 7};
+channelLabel VSG_O = {4, 2};
+channelLabel VSG_D = {4, 3};
+channelLabel VSH_O = {4, 4};
+channelLabel VSH_D = {4, 5};
+channelLabel VSI_O = {4, 6};
+channelLabel VSI_D = {4, 7};
 
 channelLabel VL4_D  = {4, 8};
-channelLabel VS10_O = {4, 9};
-channelLabel VS10_D = {4, 10};
-channelLabel VS11_O = {4, 11};
-channelLabel VS11_D = {4, 12};
-channelLabel VS12_O = {4, 13};
-channelLabel VS12_D = {4, 14};
+channelLabel VSJ_O = {4, 9};
+channelLabel VSJ_D = {4, 10};
+channelLabel VSK_O = {4, 11};
+channelLabel VSK_D = {4, 12};
+channelLabel VSL_O = {4, 13};
+channelLabel VSL_D = {4, 14};
 
-channelLabel StationDrainValves[]      = { VS1_D, VS2_D, VS3_D, VS4_D, VS5_D, VS6_D, VS7_D, VS8_D, VS9_D, VS10_D, VS11_D, VS12_D };
-channelLabel StationOverflowValves[]   = { VS1_O, VS2_O, VS3_O, VS4_O, VS5_O, VS6_O, VS7_O, VS8_O, VS9_O, VS10_O, VS11_O, VS12_O };
-channelLabel StationDisabledSwitches[] = { FS1_D, FS2_D, FS3_D, FS4_D, FS5_D, FS6_D, FS7_D, FS8_D, FS9_D, FS10_D, FS11_D, FS12_D };
+channelLabel StationDrainValves[]      = { VSA_D, VSB_D, VSC_D, VSD_D, VSE_D, VSF_D, VSG_D, VSH_D, VSI_D, VSJ_D, VSK_D, VSL_D };
+channelLabel StationOverflowValves[]   = { VSA_O, VSB_O, VSC_O, VSD_O, VSE_O, VSF_O, VSG_O, VSH_O, VSI_O, VSJ_O, VSK_O, VSL_O };
+channelLabel StationDisabledSwitches[] = { FSA_D, FSB_D, FSC_D, FSD_D, FSE_D, FSF_D, FSG_D, FSH_D, FSI_D, FSJ_D, FSK_D, FSL_D };
 channelLabel LevelDrainValves[]        = { VL1_D, VL2_D, VL3_D, VL4_D };
 const int numLevels = 4;
 const int numStationsPerLevel = 3;
@@ -167,6 +174,8 @@ bool enabledStations[]  = { true, true, true, true, true, true, true, true, true
 bool previousStations[] = { true, true, true, true, true, true, true, true, true, true, true, true };
 
 #endif
+//Station Labels
+char stationLabels[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'};
 hd44780_I2Cexp lcd; // auto detect backpack and pin mappings
 RTCZero rtc;  // Create an rtc object
 
@@ -174,22 +183,24 @@ RTCZero rtc;  // Create an rtc object
 const int LCD_COLS = 20;
 const int LCD_ROWS = 4;
 
+// FLOOD TIMES - Military Time, 800 = 0800, 1600 = 4pm,-1 is not set.
+int floodTimes [] = {800, 1600, -1, -1}; // 8am, 4pm, nada, dada
+int numFloodTimes = 4; //how many flood times will we allow?
+int nextFloodTime = -1; //next flood time
+bool triggerFlood = false; //has the flood triggered?
 
 // Create new FSM
 YA_FSM stateMachine;
 
 // State Alias
-enum State { Idle, Flood, IdlePauseTemp, IdlePause, IdlePumpOvr, IdlePumpOff, FldPauseTemp, FldPause, FldPumpOvr, FldPumpOff };
+enum State { Idle, Flood, IdlePauseTemp, IdlePause, IdlePumpOvr, IdlePumpOff, FldPauseTemp, FldPause, FldPumpOvr, FldPumpOff, Clean, ClnPumpOvr, ClnPumpOff };
 
 // Helper for print labels instead integer when state change
 const char* const stateName[] PROGMEM = { "Idle", "Flood", "Idle Pause Temp", "Idle Pause", "Pause Pump Override", "Pause Pump Off",
-                                          "Flood Pause Temp", "Flood Pause", "Pause Pump Override", "Pause Pump Off"
+                                          "Flood Pause Temp", "Flood Pause", "Pause Pump Override", "Pause Pump Off", 
+                                          "Clean", "Clean Pump Override", "Clean Pump Off"
                                         };
 
-
-//Idle State Timer
-SoftTimer idleTimer; //millisecond timer
-unsigned long idleTime = 43200000; //Default 12 hours idle state timer
 
 SoftTimer updateLcdTimer;
 
@@ -257,23 +268,40 @@ void setup() {
 
   Serial.println("ARTISAN GROWERS   !!!");
 
-  //set up Idle Timer, using default above
-  idleTimer.setTimeOutTime(idleTime);
-  idleTimer.reset(); //start the countdown, if we are here, means we reset from power or something
-
+  //set up the next flood alarm
+  int nextFloodTime = getNextFloodTime();
+  Serial.print("next flood time: ");
+  Serial.println(nextFloodTime);
+  if ( !setNextFloodAlarm(nextFloodTime) ) {
+    Serial.println("BAD FLOOD TIME");
+    Serial.println(getNextFloodTime());
+    hd44780::fatalError(-1); // does not return
+  }
+  
   floodTimer.setTimeOutTime(floodTime);
+  floodTimer.reset();
 
   updateLcdTimer.setTimeOutTime(30000); //lets update the lcd once per minute, loop counter 2 times this
   updateLcdTimer.reset(); //start the lcd update timer
 
-  valveTimer.setTimeOutTime(valveTime);
-
   secondTimer.setTimeOutTime(1000);
-
+  valveTimer.setTimeOutTime(valveTime);
   backlightTimer.setTimeOutTime(10000);
 
 
   printMenu();
+
+  //PUMP OFF
+  prevPumpState = HIGH;
+  controlPump(pump, LOW);
+  //OPEN the Level Drain Valves
+  controlLevelDrainValves(HIGH);
+  //Open the Vent Valve
+  controlVentValve(HIGH);
+  //Open the Drain Vavles
+  controlFloodStationDrainValves(HIGH);
+  //Open the Overflow Valves
+  controlFloodStationOverflowValves(HIGH);
 
   setupStateMachine();
 
@@ -295,18 +323,14 @@ void setup() {
 ******************************************/
 void printDisabledStations(hd44780_I2Cexp &outlcd) {
   //01234567890123456789
-  //Dis: 1,3,5,7,9,11,12
+  //Dis: ABCDEFGHIJKL
   clearLcdLine(outlcd, 1);
   outlcd.setCursor(0,1);
   outlcd.print("Dis: ");
-  bool itemPrinted = false;
   // enabledStations array contains true/false
   for (int i=0; i<numStations; i++) {
     if (!enabledStations[i]) {
-      if (itemPrinted) 
-        outlcd.print(",");
-      outlcd.print(i+1);
-      itemPrinted = true;
+      outlcd.print(stationLabels[i]);
     }
   }
     
@@ -352,10 +376,10 @@ void printState(hd44780_I2Cexp &outlcd, String stateLabel, unsigned long remaini
     outlcd.write(' ');
     int hours = remainingmillis / 3600000;
     int minutes = (remainingmillis % 3600000) / 60000;
-    if (hours < 9) outlcd.write('0');
+    if (hours <= 9) outlcd.write('0');
     outlcd.print((int)hours);
     outlcd.write(':');
-    if (minutes < 9) outlcd.write('0');
+    if (minutes <= 9) outlcd.write('0');
     outlcd.print((int)minutes);
 
     if (remainingmillis < 60000) {
@@ -451,7 +475,7 @@ bool notCheckPumpSwitch() {
 }
 
 /*****************************************************************************
- * VALVE SWITCHES
+ * FLOOD STATION SWITCHES
  *****************************************************************************/
 void checkDisabledFloodStations() {
   //true, the station is enabled
@@ -492,16 +516,32 @@ void checkDisabledFloodStations() {
    print out our menut to the user
  *****************************************/
 void printMenu() {
-  Serial.println("commands: y, m, d, h, M xx");
-  Serial.println("commands: D mm/dd/yy");
-  Serial.println("commands: T hh:MM");
-  Serial.println("commands: I hh:MM (set idle timer)");
-  Serial.println("commands: F MM:SS (set flood timer in minutes)");
-  Serial.println("example to set year: y 22");
-  Serial.println("example to set full date: D 02/19/22");
-  Serial.println("example to set full time: T 16:47");
-  Serial.println("example to set flood time for 4 minutes: F 4:0");
-  Serial.println("example to set Idle Timer to 1 hour: I 1:0");
+  Serial.println("");
+  Serial.println("******************************************************");
+  Serial.println("*  commands: y, m, d, h, M xx                        *");
+  Serial.println("*  commands: D mm/dd/yy                              *");
+  Serial.println("*  commands: T hh:MM                                 *");
+  Serial.println("*  commands: I hh:MM (set idle timer)                *");
+  Serial.println("*  commands: F MM:SS (set flood timer in minutes)    *");
+  Serial.println("*  commands: L (List Schedule)                       *");
+  Serial.println("*  commands: 1 800  (Set First Flood Slot to 8am)    *");
+  Serial.println("*  commands: 2 1600 (Set Second Flood Slot to 4pm)   *");
+  Serial.println("*  commands: 3 1900 (Set Third Flood Slot to 7pm)    *");
+  Serial.println("*  commands: 4 -1   (DISABLE Fourth Flood Slot)      *");
+  Serial.println("*  commands: N (Next Flood Time)                     *");
+  Serial.println("*                                                    *");
+  Serial.println("*  example to set year: y 22                         *");
+  Serial.println("*  example to set full date: D 02/19/22              *");
+  Serial.println("*  example to set full time: T 16:47                 *");
+  Serial.println("*  example to set flood time for 4 minutes: F 4:0    *");
+  Serial.println("*  example to set SCHEDULE 1: 1 800                  *");
+  Serial.println("*  example to set SCHEDULE 2: 2 1600                 *");
+  Serial.println("*  example to set SCHEDULE 3: 3 1800                 *");
+  Serial.println("*  example to set SCHEDULE 4: 4 -1                   *");
+  Serial.println("*  example to LIST SCHEDULE: L                       *");
+  Serial.println("******************************************************");
+  Serial.println("");
+
 }
 
 // A pair of varibles to help parse serial commands
@@ -585,18 +625,6 @@ int runCommand() {
       rtc.setMinutes(dt_args[1]);
       rtc.setSeconds(0);
       break;
-    case SET_IDLE_TIME:
-      i = 0;
-      while ((str = strtok_r(p, ":", &p)) != '\0') {
-        dt_args[i] = atoi(str);
-        i++;
-      }
-      Serial.println("setting idle time");
-      idleTime = dt_args[0] * 3600000 + dt_args[1] * 60000;
-      idleTimer.setTimeOutTime(idleTime);
-      idleTimer.reset();
-      updateStateNow = true;
-      break;
     case SET_FLOOD_TIME:
       i = 0;
       while ((str = strtok_r(p, ":", &p)) != '\0') {
@@ -609,12 +637,49 @@ int runCommand() {
       floodTimer.reset();
       updateStateNow = true;
       break;
+    case SET_FLOOD_1:
+      floodTimes[0] = (int)arg1;
+      setNextFloodAlarm(getNextFloodTime());
+      updateStateNow = true;
+      break;
+    case SET_FLOOD_2:
+      floodTimes[1] = (int)arg1;
+      setNextFloodAlarm(getNextFloodTime());
+      updateStateNow = true;
+      break;
+    case SET_FLOOD_3:
+      floodTimes[2] = (int)arg1;
+      setNextFloodAlarm(getNextFloodTime());
+      updateStateNow = true;
+      break;
+    case SET_FLOOD_4:
+      floodTimes[3] = (int)arg1;
+      setNextFloodAlarm(getNextFloodTime());
+      updateStateNow = true;
+      break;
+    case LIST_FLOODS:
+      Serial.print("Flood Times: ");
+      Serial.print(floodTimes[0]);
+      Serial.print(",");
+      Serial.print(floodTimes[1]);
+      Serial.print(",");
+      Serial.print(floodTimes[2]);
+      Serial.print(",");
+      Serial.println(floodTimes[3]);
+      break;
+    case NEXT_FLOOD:
+      Serial.print("Next Flood Time: ");
+      Serial.println(rtc.getAlarmHours()*100 + rtc.getAlarmMinutes());
+      break;
+    case PRINT_MENU:
+      printMenu();
+      break;
     default:
       Serial.println("Invalid Command");
   }
   printTimeDate(lcd);
   turnOnLcd();
-  printMenu();
+  //printMenu();
 }
 
 /*****************************************
@@ -665,6 +730,106 @@ void checkConsole() {
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+//////////// TIME FUNCTIONS FOR FLOODING  ////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+int currentMilTime() {
+  return rtc.getHours()*100+rtc.getMinutes();
+}
+int getNextFloodTime() {
+  for (int i=0; i<numFloodTimes; i++) {
+    if (floodTimes[i] > currentMilTime()) {
+      return floodTimes[i];
+    }
+  }
+  //if we get here, lets loop back to first timestamp that is > 0
+  for (int i=0; i<numFloodTimes; i++) {
+    if (floodTimes[i] > 0) {
+      return floodTimes[i];
+    }
+  }
+  //if we get here, there are no flood times configured.
+  return -1; //negative flood time is NO FLOOD TIME  
+}
+bool setNextFloodAlarm(int ft) {
+  if (ft < 0) {
+    Serial.println(" ##### NO FLOOD TIME AVAILABLE ###### ");
+    rtc.disableAlarm();
+    return false;
+  }
+  rtc.setAlarmTime((int)ft/100, (int)ft%100, 0);
+  triggerFlood = false;
+  rtc.enableAlarm(rtc.MATCH_HHMMSS);
+  rtc.attachInterrupt(alarmMatch);
+  return true;
+}
+void alarmMatch() {
+  triggerFlood = true;
+}
+long millisTillNextFlood() {
+  int alarmHour = rtc.getAlarmHours();
+  int alarmMin = rtc.getAlarmMinutes();
+  int nowHour = rtc.getHours();
+  int nowMin = rtc.getMinutes();
+  int nowSec = rtc.getSeconds();
+
+  //deal with rollover :(
+  int alarmHM = alarmHour * 100 + alarmMin;
+  int nowHM = nowHour * 100 + nowMin;
+#ifdef DEBUG_STATES
+  Serial.print("AlarmHM: ");
+  Serial.print(alarmHM);
+  Serial.print(", NowHM: ");
+  Serial.println(nowHM);
+#endif
+
+  int diffMin = 0;
+  int diffHour = 0;
+  if (nowHM > alarmHM){
+    //we are say at like 5pm (1700) and the next alarm is at 8am (0800)
+    if (alarmMin == nowMin) {
+      diffMin = 0;
+      diffHour = 24 + alarmHour - nowHour;
+    } else if (alarmMin < nowMin) {
+      diffMin = 60 + alarmMin - nowMin - 1;
+      diffHour = 24 - nowHour + alarmHour - 1;
+      if (diffHour < 0) diffHour = 0;
+    } else {
+      if (alarmMin ==0){
+        diffMin = 60 - nowMin;
+        if (diffMin == 60) diffMin = 0;
+      } else {
+        diffMin = alarmMin - nowMin;
+      }
+      diffHour = 24 - nowHour + alarmHour;
+    }
+  } else {
+    //next alarm is ahead of us in this day
+    //first, subract the minutes....
+    if (alarmMin == nowMin) {
+      diffMin = 0;
+      diffHour = alarmHour - nowHour;
+    } else if (alarmMin < nowMin){
+      //then we have to borrow 60 minutes from the hour
+      diffMin = 60 + alarmMin - nowMin - 1;
+      diffHour = alarmHour - nowHour - 1;
+      if (diffHour < 0) diffHour = 0;
+    } else {
+      //math is easy
+      if (alarmMin == 0) {
+        diffMin = 60 - nowMin - 1;
+        if (diffMin == 60) diffMin = 0;
+      } else {
+        diffMin = alarmMin - nowMin - 1;
+      }
+      diffHour = alarmHour - nowHour;
+    }
+  }
+  return diffHour*3600000 + diffMin * 60000 + (60 - nowSec) * 1000;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //////////// LOOP  ///////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -676,6 +841,7 @@ void loop() {
   checkRunSwitch();
   checkDisabledFloodStations();
   stateMachine.Update();
+  
 
   // update the clock every minute
   unsigned long loopCount = updateLcdTimer.getLoopCount();
@@ -696,39 +862,38 @@ void loop() {
 //////////// VALVE MANIPULATION //////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void controlFloodStationDrainValves(int startValve, int numValves, uint8_t state) {
-  int lastValve = (startValve + numValves < numStations) ? startValve + numValves : numStations;
-  for (int i = startValve; i < lastValve; i++) {
+void controlFloodStationDrainValves(uint8_t state) {
+  for (int i = 0; i < numStations; i++) {
     if (enabledStations[i]) 
       P1.writeDiscrete(state, StationDrainValves[i]);
   }
-  valveTimer.reset(); //hold changing other valves until these are done
 }
-void controlFloodStationOverflowValves(int startValve, int numValves, uint8_t state) {
-  int lastValve = (startValve + numValves < numStations) ? startValve + numValves : numStations;
-  for (int i = startValve; i < lastValve; i++) {
+void controlFloodStationOverflowValves(uint8_t state) {
+  for (int i = 0; i < numStations; i++) {
     if (enabledStations[i]) 
       P1.writeDiscrete(state, StationOverflowValves[i]);
   }
-  valveTimer.reset(); //hold changing other valves until these are done
 }
-void controlLevelDrainValves(int startValve, int numValves, uint8_t state) {
-  int lastValve = (startValve + numValves < numStations) ? startValve + numValves : numLevels;
-  for (int i = startValve; i < lastValve; i++) {
+void controlLevelDrainValves(uint8_t state) {
+  for (int i = 0; i < numLevels; i++) {
     P1.writeDiscrete(state, LevelDrainValves[i]);
   }
-  lcd.setCursor(0, 3);
-  lcd.print("MAIN DRN");
-  updateLine3 = true;
-  valveTimer.reset(); //hold changing other valves until these are done
 }
-
+void controlVentValve(uint8_t state) {
+    P1.writeDiscrete(state, VV_1);
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////// PUMP MANIPULATION ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 void controlPump(channelLabel pump, uint8_t state) {
+#ifdef DEBUG_STATES
+  Serial.print("Prev Pump State: ");
+  Serial.print(prevPumpState);
+  Serial.print(" : Current Requested State: ");
+  Serial.println(state);
+#endif
   if (state != prevPumpState) { 
     P1.writeDiscrete(state, pump);
     prevPumpState = state;
@@ -749,40 +914,40 @@ void controlPump(channelLabel pump, uint8_t state) {
  **********************************************************************/
 unsigned long idleResumeTimeLeft = 0; //use the setpoint for idle if less than 0
 unsigned long floodResumeTimeLeft = 0; // to resume flood after a pause
-int idleLevelsProcessed = 0;
 
 void idle_onEnter() {
+#ifdef DEBUG_STATES
+  Serial.print("Entering State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+
   // IDLE, we want to
-  // make sure level drains are open (do this entering)
-  // make sure overflow and station drains are open (do this in state)
+  // make sure level drains are open 
+  // make sure the vent valve is open
+  // make sure overflow and station drains are open 
   // pump is off (do this in entering)
-  // reset or restart the timer
+  // Set the RTC Alarm for the next flood
   // use the lcd to indicate what is going on
   // turn off the lcd after a timeout (do this in state)
 
   //once we go into idle, we need to reset flood timer so it doesn't resume a short flood
   floodResumeTimeLeft = 0;
   
-#ifdef DEBUG_STATES
-  Serial.print("Entering State: ");
-  Serial.println(stateName[stateMachine.GetState()]);
-#endif
   //PUMP OFF
   controlPump(pump, LOW);
   //OPEN the Level Drain Valves
-  controlLevelDrainValves(0, numLevels, HIGH);
+  controlLevelDrainValves(HIGH);
+  //Open the Vent Valve
+  controlVentValve(HIGH);
+  //Open the Drain Vavles
+  controlFloodStationDrainValves(HIGH);
+  //Open the Overflow Valves
+  controlFloodStationOverflowValves(HIGH);
 
-  //Tell the onstate that we have levels to process
-  idleLevelsProcessed = 0;
-
-  if (idleResumeTimeLeft == 0) {
-    idleTimer.setTimeOutTime(idleTime);
-  } else {
-    idleTimer.setTimeOutTime(idleResumeTimeLeft);
-  }
-  idleTimer.reset(); //restart the idle timer
-  printState(lcd, stateName[stateMachine.GetState()], idleTimer.getRemainingTime());
+  //printState(lcd, stateName[stateMachine.GetState()], idleTimer.getRemainingTime());
   turnOnLcd();
+  printState(lcd, stateName[stateMachine.GetState()], 0);
+
 }
 
 void idle_onState() {
@@ -790,75 +955,66 @@ void idle_onState() {
   Serial.print("On State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  static bool alreadyPrintedPumpState = false;
-  //Make sure our valves are in the state we want them!
-  if (idleLevelsProcessed < numLevels && valveTimer.hasTimedOut()) {
-    //then we have more valves to process
-    controlFloodStationDrainValves(idleLevelsProcessed * numStationsPerLevel, idleLevelsProcessed + numStationsPerLevel, HIGH);
-    controlFloodStationOverflowValves(idleLevelsProcessed * numStationsPerLevel, idleLevelsProcessed + numStationsPerLevel, HIGH);
-    lcd.setCursor(0, 3);
-    lcd.print("LEVEL ");
-    lcd.print(idleLevelsProcessed+1);
-    lcd.print(" ");
-    updateLine3 = true;
-    idleLevelsProcessed++;
-    alreadyPrintedPumpState = false;
-  }
-  if (!alreadyPrintedPumpState && valveTimer.hasTimedOut()) {
-    printLcdPumpState(lcd);
-    alreadyPrintedPumpState = true;
-  }
 
   // indicate to user how much time is left
   unsigned long loopCount = updateLcdTimer.getLoopCount();
   static bool alreadyUpdated = false;
-  unsigned long remainingTime = idleTimer.getRemainingTime();
+  unsigned long remainingTime = millisTillNextFlood();//idleTimer.getRemainingTime();
+#ifdef DEBUG_STATES
+  Serial.print("Remaining Time = ");
+  Serial.println(remainingTime);
+#endif
   // if it is time to update (loopcount), or we changed something (updatenow) or we are in seconds left:
   if ((((loopCount % 2) == 0) && !alreadyUpdated) || updateStateNow || (remainingTime < 60000 && secondTimer.hasTimedOut())) {  //every other 30 second loop count is 1 minute :)
-    printState(lcd, stateName[stateMachine.GetState()], idleTimer.getRemainingTime());
-    //Serial.print(loopCount);
-    //Serial.print(":");
-    //Serial.print(updateStateNow);
-    //Serial.print(":");
-    //Serial.print(remainingTime);
-    //Serial.print(":");
-    //Serial.println(secondTimer.hasTimedOut());
+    printState(lcd, stateName[stateMachine.GetState()], remainingTime);//idleTimer.getRemainingTime());
     alreadyUpdated = true;
   }
   if (loopCount % 2 == 1 ) alreadyUpdated = false;
+  if (remainingTime < 60000 && alreadyDimmed) {
+    lcd.backlight();
+  }
 
+#ifndef DEBUG_STATES
   if (backlightTimer.hasTimedOut() && !alreadyDimmed) {
-    lcd.noBacklight();
+    //lcd.noBacklight();
     alreadyDimmed = true;
   }
+#endif
+
 }
+
 void idle_onExit() {
   //store the current time_left so we can "resume" where we left off on idle
 #ifdef DEBUG_STATES
   Serial.print("Exiting State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  if (!idleTimer.hasTimedOut()) {
-    idleResumeTimeLeft = idleTimer.getRemainingTime();
-  } else {
-    idleResumeTimeLeft = 0;
-  }
+//TODO SET RTC ALARM FOR THE NEXT FLOOD CYCLE
+//  if (!idleTimer.hasTimedOut()) {
+//    idleResumeTimeLeft = idleTimer.getRemainingTime();
+//  } else {
+//    idleResumeTimeLeft = 0;
+//  }
 }
 bool transition_5() {
   // idle to flood trigger
+  //TODO BASE THIS ON A TIME, NOT A TIMER
 #ifdef DEBUG_STATES
   Serial.print("transition_5: ");
-  Serial.print(idleTimer.hasTimedOut());
-  Serial.print(" : ");
-  Serial.println(idleTimer.getRemainingTime());
+  Serial.print(triggerFlood);
+  Serial.println(";");
 #endif
-  return idleTimer.hasTimedOut();
+  if (triggerFlood && notAllStationsDisabled()) {
+    triggerFlood = false;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /**********************************************************************
    FLOOD
  **********************************************************************/
-int floodLevelsProcessed = 0; // to rotate through levels and process the valves
 
 bool transition_6() {
   // flood to idle trigger
@@ -889,13 +1045,12 @@ void flood_onEnter() {
 #endif
 
   //close the level drain valves
-  controlLevelDrainValves(0, numLevels, LOW);
-  lcd.setCursor(0, 3);
-  lcd.print("MAIN DRN");
-  updateLine3 = true;
-  valveTimer.reset(); //hold changing other valves until these are done
-  floodLevelsProcessed = 0; //tell the onstate that we have more levels to process
-
+  controlLevelDrainValves(LOW);
+  controlFloodStationDrainValves(HIGH);
+  controlFloodStationOverflowValves(HIGH);
+  controlVentValve(HIGH);
+  valveTimer.reset(); //start the 5 second timer to allow the valves to open
+  
   turnOnLcd();
   if (floodResumeTimeLeft == 0) {
     floodTimer.setTimeOutTime(floodTime);
@@ -905,27 +1060,17 @@ void flood_onEnter() {
   floodTimer.reset(); //restart the idle timer
   printState(lcd, stateName[stateMachine.GetState()], floodTimer.getRemainingTime());
 }
+
 void flood_onState() {
 #ifdef DEBUG_STATES
   Serial.print("On State: ");
   Serial.println(stateName[stateMachine.GetState()]);
+  Serial.print("Valve Timer Remaining : ");
+  Serial.println(valveTimer.getRemainingTime());
 #endif
 
-  //Make sure our valves are in the state we want them!
-  if (floodLevelsProcessed < numLevels && valveTimer.hasTimedOut()) {
-    //then we have more valves to process
-    controlFloodStationDrainValves(floodLevelsProcessed * numStationsPerLevel, floodLevelsProcessed + numStationsPerLevel, HIGH);
-    controlFloodStationOverflowValves(floodLevelsProcessed * numStationsPerLevel, floodLevelsProcessed + numStationsPerLevel, HIGH);
-    valveTimer.reset();
-    lcd.setCursor(0, 3);
-    lcd.print("LEVEL ");
-    lcd.print(floodLevelsProcessed+1);
-    lcd.print(" ");
-    updateLine3 = true;
-    floodLevelsProcessed++;
-  }
 
-  if (floodLevelsProcessed >= numLevels && valveTimer.hasTimedOut()) {
+  if (valveTimer.hasTimedOut()) {
     //PUMP ON
     controlPump(pump, HIGH);
   }
@@ -940,6 +1085,7 @@ void flood_onState() {
   }
   if (loopCount % 2 == 1 ) alreadyUpdated = false;
 }
+
 void flood_onExit() {
 #ifdef DEBUG_STATES
   Serial.print("Exiting State: ");
@@ -954,6 +1100,17 @@ void flood_onExit() {
   } else {
     floodResumeTimeLeft = 0;
   }
+
+  //select the next flood time
+   //set up the next flood alarm
+  int nextFloodTime = getNextFloodTime();
+  Serial.print("next flood time: ");
+  Serial.println(nextFloodTime);
+  if ( !setNextFloodAlarm(nextFloodTime) ) {
+    Serial.println("BAD FLOOD TIME");
+    Serial.println(getNextFloodTime());
+    hd44780::fatalError(-1); // does not return
+  } 
 }
 
 /**********************************************************************
@@ -1099,6 +1256,82 @@ void fpoff_onEnter() {
   printState(lcd, stateName[stateMachine.GetState()], 0);
 }
 
+
+/**********************************************************************
+   CLEAN 
+ **********************************************************************/
+
+void clean_onEnter() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Entering State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, LOW);
+  controlLevelDrainValves(HIGH);
+  controlFloodStationDrainValves(LOW);
+  controlFloodStationOverflowValves(LOW);
+  controlVentValve(LOW);
+
+  printState(lcd, stateName[stateMachine.GetState()], 0);
+  backlightTimer.reset();
+}
+
+/**********************************************************************
+   CLEAN PUMP OVERRIDE
+ **********************************************************************/
+
+void cpovr_onEnter() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Entering State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, HIGH);
+  printState(lcd, stateName[stateMachine.GetState()], 0);
+  lcd.setCursor(0, 3);
+  lcd.write("PUMP OVR");
+}
+void cpovr_onExit() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Exiting State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, LOW);
+}
+
+/**********************************************************************
+   CLEAN  PUMP OFF
+ **********************************************************************/
+
+void cpoff_onEnter() {
+  turnOnLcd();
+#ifdef DEBUG_STATES
+  Serial.print("Entering State: ");
+  Serial.println(stateName[stateMachine.GetState()]);
+#endif
+  controlPump(pump, LOW);
+  printState(lcd, stateName[stateMachine.GetState()], 0);
+}
+
+bool allStationsDisabled() {
+  //true, the station is enabled
+  //false, the station is disabled
+  //INPUT, LOW the station is enabled.
+  for (int i=0; i<numStations; i++) {
+    if ( P1.readDiscrete(StationDisabledSwitches[i]) == LOW ) {
+      return false; //at least 1 station is enabled, LOW = enabled.
+    }
+  }
+  return true; // no stations were enabled, therefore all stations are disabled
+}
+bool notAllStationsDisabled() {
+  return !allStationsDisabled();
+}
+
+
+
 /**********************************************************************
    STATE MACHINE DEFINITION
  **********************************************************************/
@@ -1122,31 +1355,34 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[FldPumpOvr],       0, fpovr_onEnter, nullptr,       ipovr_onExit );
   stateMachine.AddState(stateName[FldPumpOff],       0, fpoff_onEnter, nullptr,       nullptr      );
 
-  // Add transitions with related trigger input callback functions
-  stateMachine.AddTransition(Idle,          Flood,         transition_5                                     );
-  stateMachine.AddTransition(Flood,         Idle,          transition_6                                     );
-  stateMachine.AddTransition(Idle,          IdlePauseTemp, notCheckRunSwitch                                );
-  stateMachine.AddTransition(IdlePauseTemp, Flood,         checkRunSwitch                                   );
-  stateMachine.AddTransition(IdlePauseTemp, IdlePause, []() {
-    return stateMachine.CurrentState()->timeout;
-  } );
-  stateMachine.AddTransition(IdlePause,     Idle,          checkRunSwitch                                   );
-  stateMachine.AddTransition(IdlePause,     IdlePumpOvr,   checkPumpSwitch                                  );
-  stateMachine.AddTransition(IdlePumpOvr,   IdlePumpOff,   notCheckPumpSwitch                               );
-  stateMachine.AddTransition(IdlePumpOff,   IdlePause, []() {
-    return true;
-  }                                 );
+  stateMachine.AddState(stateName[Clean],            0, clean_onEnter, nullptr,       nullptr      );
+  stateMachine.AddState(stateName[ClnPumpOvr],       0, cpovr_onEnter, nullptr,       cpovr_onExit );
+  stateMachine.AddState(stateName[ClnPumpOff],       0, cpoff_onEnter, nullptr,       nullptr      );
 
-  stateMachine.AddTransition(Flood,         FldPauseTemp, notCheckRunSwitch                                 );
-  stateMachine.AddTransition(FldPauseTemp,  Idle,         checkRunSwitch                                    );
-  stateMachine.AddTransition(FldPauseTemp,  FldPause, []() {
-    return stateMachine.CurrentState()->timeout;
-  }  );
-  stateMachine.AddTransition(FldPause,      FldPumpOvr,   checkPumpSwitch                                   );
-  stateMachine.AddTransition(FldPause,      Flood,        checkRunSwitch                                    );
-  stateMachine.AddTransition(FldPumpOvr,    FldPumpOff,   notCheckPumpSwitch                                );
-  stateMachine.AddTransition(FldPumpOff,    FldPause, []() {
-    return true;
-  }                                  );
+  // Add transitions with related trigger input callback functions
+  stateMachine.AddTransition(Idle,          Flood,         transition_5                            );
+  stateMachine.AddTransition(Flood,         Idle,          transition_6                            );
+  stateMachine.AddTransition(Idle,          IdlePauseTemp, notCheckRunSwitch                       );
+  stateMachine.AddTransition(IdlePauseTemp, Flood,         checkRunSwitch                          );
+  stateMachine.AddTransition(IdlePauseTemp, IdlePause, []() { return stateMachine.CurrentState()->timeout; } );
+  stateMachine.AddTransition(IdlePause,     Idle,          checkRunSwitch                          );
+  stateMachine.AddTransition(IdlePause,     IdlePumpOvr,   checkPumpSwitch                         );
+  stateMachine.AddTransition(IdlePumpOvr,   IdlePumpOff,   notCheckPumpSwitch                      );
+  stateMachine.AddTransition(IdlePumpOff,   IdlePause, []() { return true; }                       );
+
+  stateMachine.AddTransition(IdlePause,     Clean,         allStationsDisabled                     );
+  stateMachine.AddTransition(Clean,         IdlePause,     notAllStationsDisabled                  );
+  stateMachine.AddTransition(Clean,         ClnPumpOvr,    checkPumpSwitch                         );
+  stateMachine.AddTransition(ClnPumpOvr,    ClnPumpOff,    notCheckPumpSwitch                      );
+  stateMachine.AddTransition(ClnPumpOff,    Clean,     []() { return true; }                       );
+
+
+  stateMachine.AddTransition(Flood,         FldPauseTemp, notCheckRunSwitch                        );
+  stateMachine.AddTransition(FldPauseTemp,  Idle,         checkRunSwitch                           );
+  stateMachine.AddTransition(FldPauseTemp,  FldPause, []() { return stateMachine.CurrentState()->timeout; }  );
+  stateMachine.AddTransition(FldPause,      FldPumpOvr,   checkPumpSwitch                          );
+  stateMachine.AddTransition(FldPause,      Flood,        checkRunSwitch                           );
+  stateMachine.AddTransition(FldPumpOvr,    FldPumpOff,   notCheckPumpSwitch                       );
+  stateMachine.AddTransition(FldPumpOff,    FldPause, []() { return true; }                        );
 
 }

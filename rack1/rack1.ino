@@ -1,5 +1,6 @@
 //FEATURES TO TEST
 // do not go into flood if all stations are disabled  
+// test calculation of flood times with [800, 1600, 0, -1] after 4pm
 
 //issues, 
 //     Next flood not calculating after setting a new time, something about 0, or less than 800
@@ -28,7 +29,7 @@
 #include <YA_FSM.h> // state machine, states and transitions
 //#include <string.h> //string libraries
 
-#define DEV_PLATFORM //comment line out for PROD platform
+//#define DEV_PLATFORM //comment line out for PROD platform
 //#define DEBUG_STATES //uncoment when done troubleshooting states
 
 /*****************************************************************
@@ -737,17 +738,24 @@ int currentMilTime() {
   return rtc.getHours()*100+rtc.getMinutes();
 }
 int getNextFloodTime() {
+  int tempHoldingTime = 9999;
   for (int i=0; i<numFloodTimes; i++) {
     if (floodTimes[i] > currentMilTime()) {
-      return floodTimes[i];
+      if (floodTimes[i] < tempHoldingTime)
+        tempHoldingTime = floodTimes[i];
     }
   }
+  if (tempHoldingTime < 2359) return tempHoldingTime;
+
   //if we get here, lets loop back to first timestamp that is > 0
+  tempHoldingTime = 9999;
   for (int i=0; i<numFloodTimes; i++) {
-    if (floodTimes[i] > 0) {
-      return floodTimes[i];
+    if (floodTimes[i] >= 0) {
+      if (tempHoldingTime > floodTimes[i])
+        tempHoldingTime = floodTimes[i];
     }
   }
+  if (tempHoldingTime < 2359) return tempHoldingTime;
   //if we get here, there are no flood times configured.
   return -1; //negative flood time is NO FLOOD TIME  
 }

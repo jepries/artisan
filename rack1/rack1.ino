@@ -29,7 +29,7 @@
 #include <YA_FSM.h> // state machine, states and transitions
 //#include <string.h> //string libraries
 
-#define DEV_PLATFORM //comment line out for PROD platform
+//#define DEV_PLATFORM //comment line out for PROD platform
 //#define DEBUG_STATES //uncoment when done troubleshooting states
 
 /*****************************************************************

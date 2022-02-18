@@ -229,6 +229,14 @@ bool pumpSwitchState = 0; //Varialbe to hold the current state of the pump overr
 int output = 0;
 uint8_t prevPumpState = LOW; //store the last known state of the pump
 
+///// NORMALLY OPEN VALVES, OPEN = LOW, CLOSE = HIGH
+///// NORMALLY CLOSED VALVES, OPEN = HIGH, CLOSE = LOW
+uint8_t OPEN   = LOW;
+uint8_t CLOSED = HIGH;
+///// pump on/off
+uint8_t ON = HIGH;
+uint8_t OFF = LOW;
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////// SETUP ///////////////////////////////////////////////////////////
@@ -293,16 +301,16 @@ void setup() {
   printMenu();
 
   //PUMP OFF
-  prevPumpState = HIGH;
-  controlPump(pump, LOW);
+  prevPumpState = ON;
+  controlPump(pump, OFF);
   //OPEN the Level Drain Valves
-  controlLevelDrainValves(HIGH);
+  controlLevelDrainValves(OPEN);
   //Open the Vent Valve
-  controlVentValve(HIGH);
+  controlVentValve(OPEN);
   //Open the Drain Vavles
-  controlFloodStationDrainValves(HIGH);
+  controlFloodStationDrainValves(OPEN);
   //Open the Overflow Valves
-  controlFloodStationOverflowValves(HIGH);
+  controlFloodStationOverflowValves(OPEN);
 
   setupStateMachine();
 
@@ -487,13 +495,13 @@ void checkDisabledFloodStations() {
     enabledStations[i] = P1.readDiscrete(StationDisabledSwitches[i]) == LOW;
     //immediately turn off the station if we see this
     if (enabledStations[i] != previousStations[i] && !enabledStations[i]) {
-      P1.writeDiscrete(LOW, StationOverflowValves[i]);
-      P1.writeDiscrete(LOW, StationDrainValves[i]);
+      P1.writeDiscrete(CLOSED, StationOverflowValves[i]);
+      P1.writeDiscrete(CLOSED, StationDrainValves[i]);
     }
     if (enabledStations[i] != previousStations[i] && enabledStations[i] //&&
         /*stateMachine.GetState() <= 1 */) { //and we are in idle or flood, turn valves back on
-      P1.writeDiscrete(HIGH, StationOverflowValves[i]);
-      P1.writeDiscrete(HIGH, StationDrainValves[i]);
+      P1.writeDiscrete(OPEN, StationOverflowValves[i]);
+      P1.writeDiscrete(OPEN, StationDrainValves[i]);
     }
     if (enabledStations[i] != previousStations[i]) {
       //state change detected
@@ -942,15 +950,15 @@ void idle_onEnter() {
   floodResumeTimeLeft = 0;
   
   //PUMP OFF
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
   //OPEN the Level Drain Valves
-  controlLevelDrainValves(HIGH);
+  controlLevelDrainValves(OPEN);
   //Open the Vent Valve
-  controlVentValve(HIGH);
+  controlVentValve(OPEN);
   //Open the Drain Vavles
-  controlFloodStationDrainValves(HIGH);
+  controlFloodStationDrainValves(OPEN);
   //Open the Overflow Valves
-  controlFloodStationOverflowValves(HIGH);
+  controlFloodStationOverflowValves(OPEN);
 
   //printState(lcd, stateName[stateMachine.GetState()], idleTimer.getRemainingTime());
   turnOnLcd();
@@ -1053,10 +1061,12 @@ void flood_onEnter() {
 #endif
 
   //close the level drain valves
-  controlLevelDrainValves(LOW);
-  controlFloodStationDrainValves(HIGH);
-  controlFloodStationOverflowValves(HIGH);
-  controlVentValve(HIGH);
+  controlLevelDrainValves(CLOSED);
+  //Open the station drain and overflow drains
+  controlFloodStationDrainValves(OPEN);
+  controlFloodStationOverflowValves(OPEN);
+  //open the vent valve
+  controlVentValve(OPEN);
   valveTimer.reset(); //start the 5 second timer to allow the valves to open
   
   turnOnLcd();
@@ -1080,7 +1090,7 @@ void flood_onState() {
 
   if (valveTimer.hasTimedOut()) {
     //PUMP ON
-    controlPump(pump, HIGH);
+    controlPump(pump, ON);
   }
 
   // indicate to user how much time is left
@@ -1100,7 +1110,7 @@ void flood_onExit() {
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
   //PUMP Off
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
 
   //store the current time_left so we can "resume" where we left off on idle
   if (!floodTimer.hasTimedOut()) {
@@ -1131,7 +1141,7 @@ void ipt_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
   printState(lcd, stateName[stateMachine.GetState()], 0);
 }
 
@@ -1145,7 +1155,7 @@ void ip_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
   printState(lcd, stateName[stateMachine.GetState()], 0);
   backlightTimer.reset();
 }
@@ -1166,7 +1176,7 @@ void ipovr_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, HIGH);
+  controlPump(pump, ON);
   printState(lcd, stateName[stateMachine.GetState()], 0);
   lcd.setCursor(0, 3);
   lcd.write("PUMP OVR");
@@ -1177,7 +1187,7 @@ void ipovr_onExit() {
   Serial.print("Exiting State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
 }
 
 /**********************************************************************
@@ -1204,7 +1214,7 @@ void fpt_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
   printState(lcd, stateName[stateMachine.GetState()], 0);
 }
 
@@ -1218,7 +1228,7 @@ void fp_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
   printState(lcd, stateName[stateMachine.GetState()], 0);
   backlightTimer.reset();
 }
@@ -1239,7 +1249,7 @@ void fpovr_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, HIGH);
+  controlPump(pump, ON);
   printState(lcd, stateName[stateMachine.GetState()], 0);
 }
 void fpovr_onExit() {
@@ -1247,7 +1257,7 @@ void fpovr_onExit() {
   Serial.print("Exiting State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
 }
 
 /**********************************************************************
@@ -1260,7 +1270,7 @@ void fpoff_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
   printState(lcd, stateName[stateMachine.GetState()], 0);
 }
 
@@ -1275,11 +1285,11 @@ void clean_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
-  controlLevelDrainValves(HIGH);
-  controlFloodStationDrainValves(LOW);
-  controlFloodStationOverflowValves(LOW);
-  controlVentValve(LOW);
+  controlPump(pump, OFF);
+  controlLevelDrainValves(OPEN);
+  controlFloodStationDrainValves(CLOSED);
+  controlFloodStationOverflowValves(CLOSED);
+  controlVentValve(CLOSED);
 
   printState(lcd, stateName[stateMachine.GetState()], 0);
   backlightTimer.reset();
@@ -1295,7 +1305,7 @@ void cpovr_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, HIGH);
+  controlPump(pump, ON);
   printState(lcd, stateName[stateMachine.GetState()], 0);
   lcd.setCursor(0, 3);
   lcd.write("PUMP OVR");
@@ -1306,7 +1316,7 @@ void cpovr_onExit() {
   Serial.print("Exiting State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
 }
 
 /**********************************************************************
@@ -1319,7 +1329,7 @@ void cpoff_onEnter() {
   Serial.print("Entering State: ");
   Serial.println(stateName[stateMachine.GetState()]);
 #endif
-  controlPump(pump, LOW);
+  controlPump(pump, OFF);
   printState(lcd, stateName[stateMachine.GetState()], 0);
 }
 
